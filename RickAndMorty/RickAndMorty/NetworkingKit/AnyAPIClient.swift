@@ -27,8 +27,12 @@ extension AnyAPIClient {
         session: URLSessionProtocol = URLSession.shared
     ) -> AnyAPIClient<E> {
         switch kind {
-        case .live: return AnyAPIClient(APIClient<E>(session: session))
-        case .mock: return AnyAPIClient(MockAPIClient<E>())
+        case .live:
+            return AnyAPIClient(APIClient<E>(session: session))
+        case .mock:
+            return AnyAPIClient(MockAPIClient<E>())
+        case .failure(let error):
+            return AnyAPIClient(ErrorAPIClient<E>(error: error))
         }
     }
 }

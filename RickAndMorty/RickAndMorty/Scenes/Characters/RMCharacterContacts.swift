@@ -20,6 +20,9 @@ protocol RMCharacterViewControllerProtocol: AnyObject {
 
 protocol RMCharacterPresenterProtocol: AnyObject {
     func viewDidLoad()
+    func getNumberOfItems() -> Int
+    func createRMCharacterTableViewCellViewModel(at index: Int) -> RMCharacterTableViewCellViewModel
+    func didSelectItem(at index: Int)
 }
 
 // MARK: - Interactor

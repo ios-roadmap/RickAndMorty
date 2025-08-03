@@ -9,7 +9,6 @@ import UIKit
 
 final class RMCharacterRouter: RMCharacterRouterProtocol {
     
-    weak var viewController: UIViewController!
     weak var navigationController: UINavigationController?
 
     init(navigationController: UINavigationController?) {

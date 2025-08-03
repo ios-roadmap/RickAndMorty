@@ -19,6 +19,18 @@ final class RMCharacterPresenter: RMCharacterPresenterProtocol {
         viewController?.showLoading()
         interactor?.fetchCharacters()
     }
+    
+    func getNumberOfItems() -> Int {
+        characters.count
+    }
+    
+    func createRMCharacterTableViewCellViewModel(at index: Int) -> RMCharacterTableViewCellViewModel {
+        return RMCharacterTableViewCellViewModel(title: characters[index].name ?? "Null")
+    }
+    
+    func didSelectItem(at index: Int) {
+        router.navigateToDetail(with: characters[index])
+    }
 }
 
 extension RMCharacterPresenter: RMCharacterInteractorOutputProtocol {

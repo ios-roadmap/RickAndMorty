@@ -8,6 +8,11 @@
 import Foundation
 import Combine
 
+enum APIKind {
+    case live, mock
+    case failure(APIError)
+}
+
 struct ServiceProvider<E: APIEndpoint>: APIClientProtocol {
 
     private let client: AnyAPIClient<E>

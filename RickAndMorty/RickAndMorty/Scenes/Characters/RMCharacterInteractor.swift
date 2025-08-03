@@ -20,6 +20,7 @@ final class RMCharacterInteractor: RMCharacterInteractorProtocol {
     
     func fetchCharacters() {
         service.fetchCharacters()
+            .receive(on: RunLoop.main)
             .sink { [weak self] completion in
                 guard case .failure(let error) = completion else { return }
                 self?.presenter?.didFailWithError(error)

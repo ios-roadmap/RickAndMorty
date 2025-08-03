@@ -39,8 +39,3 @@ enum APIError: Error, Equatable {
     case decodingFailed
     case customError(statusCode: Int)
 }
-
-enum APIKind {
-    case live, mock
-}
-
