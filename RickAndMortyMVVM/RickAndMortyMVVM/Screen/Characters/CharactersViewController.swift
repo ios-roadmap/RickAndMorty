@@ -35,12 +35,10 @@ final class CharactersViewController: UIViewController,
         return indicator
     }()
     
-    private lazy var viewModel = CharactersViewModel()
+    private lazy var viewModel = CharactersViewModel(viewController: self)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        viewModel.viewController = self
         viewModel.viewDidLoad()
     }
 }

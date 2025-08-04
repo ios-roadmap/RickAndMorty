@@ -8,9 +8,7 @@
 import Foundation
 
 @MainActor
-protocol CharactersViewModelInterface {
-    var viewController: CharactersViewControllerInterface? { get set }
-    
+protocol CharactersViewModelInterface {    
     func viewDidLoad()
     func numberOfItems() -> Int
     func configure(cell: CharacterCollectionViewCell, at index: Int)
@@ -19,7 +17,11 @@ protocol CharactersViewModelInterface {
 
 final class CharactersViewModel {
     
-    weak var viewController: CharactersViewControllerInterface?
+    private weak var viewController: CharactersViewControllerInterface?
+    
+    init(viewController: CharactersViewControllerInterface) {
+        self.viewController = viewController
+    }
     
     var page: Int = 1
     var isPageRefreshing: Bool = false

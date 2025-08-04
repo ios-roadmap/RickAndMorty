@@ -197,6 +197,7 @@
 					};
 					645DA3D42E40F5D500D6746B = {
 						CreatedOnToolsVersion = 16.0;
+						LastSwiftMigration = 1600;
 						TestTargetID = 645DA3BE2E40F5D300D6746B;
 					};
 					645DA3DE2E40F5D500D6746B = {
@@ -468,6 +469,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
@@ -477,6 +479,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosroadmap.RickAndMortyMVVMTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RickAndMortyMVVM.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RickAndMortyMVVM";
@@ -487,6 +490,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8W2QVSMGJ3;
