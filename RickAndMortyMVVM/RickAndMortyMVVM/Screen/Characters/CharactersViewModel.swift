@@ -22,17 +22,17 @@ final class CharactersViewModel {
     
     init(
         viewController: CharactersViewControllerInterface,
-        service: LiveRMService
+        service: RMServiceInterface
     ) {
         self.viewController = viewController
         self.rmService = service
     }
     
-    private var page: Int = 1
-    private var isPageRefreshing: Bool = false // UIRefreshController
+    private(set) var page: Int = 1
+    private(set) var isPageRefreshing: Bool = false // UIRefreshController
     
-    private var characterInfo: RMCharacterInfo?
-    private var characters: [RMCharacter] = []
+    private(set) var characterInfo: RMCharacterInfo?
+    private(set) var characters: [RMCharacter] = []
     
     private func fetchCharacters(page: Int = 1) async {
         await viewController?.preFetch()

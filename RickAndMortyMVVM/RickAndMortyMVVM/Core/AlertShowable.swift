@@ -9,8 +9,8 @@ import UIKit
 
 protocol AlertShowable {
     func showAlert(_ message: String, completion: VoidHandler?)
-    func showAndDismissAlert(_ message: String, completion: @escaping () -> ())
-    func showConfirmationAlert(_ message: String, completion: @escaping () -> ())
+    func showAndDismissAlert(_ message: String, completion: VoidHandler?)
+    func showConfirmationAlert(_ message: String, completion: VoidHandler?)
 }
 
 extension AlertShowable where Self: UIViewController {
@@ -25,21 +25,21 @@ extension AlertShowable where Self: UIViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
-    func showAndDismissAlert(_ message: String, completion: @escaping () -> ()) {
+    func showAndDismissAlert(_ message: String, completion: VoidHandler?) {
         let alert = UIAlertController(title: "Uyarı", message: message, preferredStyle: .alert)
         present(alert, animated: true, completion: nil)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             alert.dismiss(animated: true) {
-                completion()
+                completion?()
             }
         }
     }
 
-    func showConfirmationAlert(_ message: String, completion: @escaping () -> ()) {
+    func showConfirmationAlert(_ message: String, completion: VoidHandler?) {
         let alert = UIAlertController(title: "Uyarı", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Vazgeç", style: .destructive))
         alert.addAction(UIAlertAction(title: "Tamam", style: .default, handler: { _ in
-            completion()
+            completion?()
         }))
         present(alert, animated: true, completion: nil)
     }

@@ -13,7 +13,6 @@ final class CharactersViewModelTests: XCTestCase {
     
     private var sut: CharactersViewModel!
     private var viewController: MockCharactersViewController!
-    private var service: MockNetworkService!
     
     override class func setUp() {
         print("Ömer Faruk Öztürk")
@@ -22,25 +21,10 @@ final class CharactersViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         viewController = MockCharactersViewController()
-        let rmcharacters = RMCharacters(
-            info: .init(count: 1, pages: 2, next: "next", prev: "prev"),
-            results: [.init(
-                id: 1,
-                name: "name",
-                status: .alive,
-                species: "species",
-                type: "type",
-                gender: "gender",
-                origin: .init(name: "name", url: "url"),
-                location: .init(name: "name", url: "url"),
-                image: "image",
-                episode: ["episode"],
-                url: "url",
-                created: "created"
-            )]
+        sut = CharactersViewModel(
+            viewController: viewController,
+            service: MockRMService()
         )
-        service = MockNetworkService(response: rmcharacters)
-        sut = CharactersViewModel(viewController: viewController, service: service)
         print("setup trigger")
     }
     
@@ -63,7 +47,7 @@ final class CharactersViewModelTests: XCTestCase {
     
     func test_numberOfItms_ShouldBeSetCount() async {
         await sut.viewDidLoad()
-        XCTAssertEqual(sut.numberOfItems(), 1)
+        XCTAssertEqual(sut.numberOfItems(), 0)
     }
     
     func test_configureCellAtIndex_ShouldBeSetCharacter() async {
@@ -77,6 +61,31 @@ final class CharactersViewModelTests: XCTestCase {
         sut.willDisplayItem(at: 19)
         XCTAssertEqual(sut.characters.count, 0)
         XCTAssertEqual(sut.page, 1)
-        XCTAssertEqual(sut.characterInfo?.pages, 42)
+        XCTAssertEqual(sut.characterInfo?.pages, 3)
     }
+    
+    func test_DidFailedFetch_ShouldBeShowAlert() async {
+        let expectation = XCTestExpectation(description: "Fetch should fail and alert should be shown")
+
+        viewController = MockCharactersViewController()
+        viewController.onShowAlert = {
+            expectation.fulfill()
+        }
+
+        sut = CharactersViewModel(
+            viewController: viewController,
+            service: ErrorRMService()
+        )
+
+        await sut.viewDidLoad()
+
+        // Burada async işlemlerin tamamlanmasını bekliyoruz
+        await fulfillment(of: [expectation], timeout: 2.0)
+
+        XCTAssertTrue(viewController.showAlertCalled)
+        XCTAssertTrue(viewController.preFetchCalled)
+        XCTAssertTrue(viewController.fetchFailedCalled)
+        XCTAssertEqual(viewController.fetchFailedParam, "The operation couldn’t be completed. (RickAndMortyMVVM.NetworkError error 0.)")
+    }
+
 }

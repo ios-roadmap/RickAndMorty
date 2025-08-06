@@ -8,7 +8,8 @@
 import UIKit
 @testable import RickAndMortyMVVM
 
-final class MockCharactersViewController: CharactersViewControllerInterface {
+final class MockCharactersViewController: CharactersViewControllerInterface,
+                                          AlertShowable {
     
     var prepareCollectionViewCalled = false
     var setBackgroundColorCalled = false
@@ -42,5 +43,21 @@ final class MockCharactersViewController: CharactersViewControllerInterface {
     func fetchFailed(message: String) {
         fetchFailedCalled = true
         fetchFailedParam = message
+        showAlert(message, completion: nil)
+    }
+    
+    var showAlertCalled = false
+    var onShowAlert: (() -> Void)?
+    func showAlert(_ message: String, completion: RickAndMortyMVVM.VoidHandler?) {
+        showAlertCalled = true
+        onShowAlert?()
+    }
+    
+    func showAndDismissAlert(_ message: String, completion: RickAndMortyMVVM.VoidHandler?) {
+        
+    }
+    
+    func showConfirmationAlert(_ message: String, completion: RickAndMortyMVVM.VoidHandler?) {
+        
     }
 }
