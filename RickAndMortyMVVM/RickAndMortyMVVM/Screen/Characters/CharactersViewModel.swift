@@ -9,59 +9,81 @@ import Foundation
 
 @MainActor
 protocol CharactersViewModelInterface {    
-    func viewDidLoad()
+    func viewDidLoad() async
     func numberOfItems() -> Int
     func configure(cell: CharacterCollectionViewCell, at index: Int)
-    func willDisplayItem(at index: Int)
+    func willDisplayItem(at index: Int) async
 }
 
 final class CharactersViewModel {
     
     private weak var viewController: CharactersViewControllerInterface?
+    private var rmService: RMServiceInterface
     
-    init(viewController: CharactersViewControllerInterface) {
+    init(
+        viewController: CharactersViewControllerInterface,
+        service: LiveRMService
+    ) {
         self.viewController = viewController
+        self.rmService = service
     }
     
-    var page: Int = 1
-    var isPageRefreshing: Bool = false
+    private var page: Int = 1
+    private var isPageRefreshing: Bool = false // UIRefreshController
     
     private var characterInfo: RMCharacterInfo?
     private var characters: [RMCharacter] = []
     
-    private var rmService = APIClient<RMEndpoint>()
-    
     private func fetchCharacters(page: Int = 1) async {
         await viewController?.preFetch()
         
-        do {
-            let rmCharacters: RMCharacters = try await rmService.request(.character(page: page == 1 ? nil : page))
-            characterInfo = rmCharacters.info
-            characters += rmCharacters.results ?? []
+        await rmService.fetchCharacters(page: page <= 1 ? nil : page) { [weak self] result in
+            guard let self else { return }
             
-            await MainActor.run {
-                viewController?.fetchLoaded()
+            Task { [weak self] in
+                guard let self else { return }
                 
-                guard characters.isEmpty else {
-                    return
+                switch result {
+                case .success(let rmCharacters):
+                    await didFetchCharacters(rmCharacters: rmCharacters)
+                case .failure(let error):
+                    await didFailedFetch(error: error)
                 }
-                
-                viewController?.fetchFailed(message: "Fetch an empty data")
             }
-        } catch {
-            await viewController?.fetchFailed(message: error.localizedDescription)
         }
+    }
+    
+    func didFetchCharacters(rmCharacters: RMCharacters) async {
+        characterInfo = rmCharacters.info
+        
+        let newResults = rmCharacters.results ?? []
+        characters.append(contentsOf: newResults)
+        
+        characters += rmCharacters.results ?? []
+        print("characters: \(characters.count)")
+        
+        if characters.isEmpty {
+            guard characters.isEmpty else {
+                return
+            }
+            
+            await viewController?.fetchFailed(message: "Fetch an empty data")
+        } else {
+            await self.viewController?.fetchLoaded()
+        }
+    }
+    
+    func didFailedFetch(error: Error) async {
+        await viewController?.fetchFailed(message: error.localizedDescription)
     }
 }
 
 extension CharactersViewModel: CharactersViewModelInterface {
-    func viewDidLoad() {
+    func viewDidLoad() async {
         viewController?.prepareCollectionView()
         viewController?.setBackgroundColor(.systemBackground)
         
-        Task {
-            await fetchCharacters()
-        }
+        await fetchCharacters()
     }
     
     func numberOfItems() -> Int {
@@ -74,9 +96,10 @@ extension CharactersViewModel: CharactersViewModelInterface {
     }
     
     func willDisplayItem(at index: Int) {
-        if index == characters.count - 1, page < characterInfo?.pages ?? 0 {
-            page += 1
-            Task {
+        Task { [weak self] in
+            guard let self else { return }
+            if index == characters.count - 1, page < characterInfo?.pages ?? 0 {
+                page += 1
                 await fetchCharacters(page: page)
             }
         }

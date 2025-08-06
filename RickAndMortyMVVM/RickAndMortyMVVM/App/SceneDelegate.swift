@@ -21,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
         let navigationController = UINavigationController()
         
-        let rootViewController = HomeViewController()
+        let rootViewController = GithubViewController()
         navigationController.viewControllers = [rootViewController]
         
         

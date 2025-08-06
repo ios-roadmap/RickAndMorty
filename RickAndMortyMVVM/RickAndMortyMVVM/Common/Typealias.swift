@@ -8,3 +8,4 @@
 import Foundation
 
 typealias VoidHandler = () -> Void
+typealias GenericHandler<T> = (T) -> Void

@@ -19,7 +19,8 @@ protocol CharactersViewControllerInterface: AnyObject {
 
 final class CharactersViewController: UIViewController,
                                       AlertShowable,
-                                      NavigationPerformable {
+                                      IndicatorShowable,
+                                      Navigationable {
     
     enum Constants {
         enum Spacing {
@@ -29,17 +30,18 @@ final class CharactersViewController: UIViewController,
     
     private lazy var collectionView: UICollectionView = .init()
     
-    private lazy var indicatorView: UIActivityIndicatorView = {
-        let indicator = UIActivityIndicatorView(style: .large)
-        indicator.translatesAutoresizingMaskIntoConstraints = false
-        return indicator
-    }()
+    private lazy var indicatorView = UIActivityIndicatorView(style: .large)
     
-    private lazy var viewModel = CharactersViewModel(viewController: self)
+    private lazy var viewModel = CharactersViewModel(
+        viewController: self,
+        service: LiveRMService()
+    )
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel.viewDidLoad()
+        Task { [weak self] in
+            await self?.viewModel.viewDidLoad()
+        }
     }
 }
 
@@ -90,7 +92,7 @@ extension CharactersViewController: CharactersViewControllerInterface {
         flowLayout.minimumLineSpacing = 0
         flowLayout.minimumInteritemSpacing = 0
         
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         collectionView.register(CharacterCollectionViewCell.self, forCellWithReuseIdentifier: CharacterCollectionViewCell.identifier)
         
         collectionView.delegate = self
@@ -100,17 +102,14 @@ extension CharactersViewController: CharactersViewControllerInterface {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        view.addSubview(indicatorView)
+        
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            
-            indicatorView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-            indicatorView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
     
@@ -119,11 +118,11 @@ extension CharactersViewController: CharactersViewControllerInterface {
     }
     
     func preFetch() {
-        indicatorView.startAnimating()
+        showIndicator(indicatorView)
     }
     
     func fetchLoaded() {
-        indicatorView.stopAnimating()
+        hideIndicator(indicatorView)
         collectionView.reloadData()
     }
     

@@ -7,12 +7,14 @@
 
 import Foundation
 
-enum RMEndpoint: APIEndpoint {
+enum RMEndpoint: Endpoint {
     case character(page: Int?)
     case location
     case episode
 
-    var baseURL: URL { URL(string: "https://rickandmortyapi.com/api")! }
+    var baseURL: String {
+        "https://rickandmortyapi.com/api"
+    }
 
     var path: String {
         switch self {
@@ -22,15 +24,10 @@ enum RMEndpoint: APIEndpoint {
                 path += "?page=\(page)"
             }
             return path
-            //https://rickandmortyapi.com/api/character?page=2"
         case .location:
             return "/location"
         case .episode:   
             return "/episode"
         }
     }
-
-    var method: HTTPMethod { .get }
-    var headers: [String: String]? { ["Content-Type": "application/json"] }
-    var body: Data? { nil }
 }

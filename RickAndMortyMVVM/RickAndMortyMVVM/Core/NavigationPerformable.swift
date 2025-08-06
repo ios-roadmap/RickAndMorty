@@ -7,11 +7,12 @@
 
 import UIKit
 
-protocol NavigationPerformable {
+@MainActor
+protocol Navigationable {
     func navigate(to viewController: UIViewController, animated: Bool)
 }
 
-extension NavigationPerformable where Self: UIViewController {
+extension Navigationable where Self: UIViewController {
     func navigate(to viewController: UIViewController, animated: Bool = true) {
         navigationController?.pushViewController(viewController, animated: animated)
     }

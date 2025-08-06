@@ -10,27 +10,37 @@ import UIKit
 
 final class MockCharactersViewController: CharactersViewControllerInterface {
     
+    var prepareCollectionViewCalled = false
+    var setBackgroundColorCalled = false
+    var setBackgroundColorParam: UIColor? = nil
+    var preFetchCalled = false
+    var fetchLoadedCalled = false
+    var fetchFailedCalled = false
+    var fetchFailedParam: String? = nil
+    
     init() {
         
     }
     
     func prepareCollectionView() {
-        
+        prepareCollectionViewCalled = true
     }
     
     func setBackgroundColor(_ color: UIColor) {
-        
+        setBackgroundColorCalled = true
+        setBackgroundColorParam = color
     }
     
     func preFetch() {
-        
+        preFetchCalled = true
     }
     
     func fetchLoaded() {
-        
+        fetchLoadedCalled = true
     }
     
     func fetchFailed(message: String) {
-        
+        fetchFailedCalled = true
+        fetchFailedParam = message
     }
 }
