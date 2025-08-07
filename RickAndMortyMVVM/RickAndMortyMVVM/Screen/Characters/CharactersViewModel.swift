@@ -13,6 +13,7 @@ protocol CharactersViewModelInterface {
     func numberOfItems() -> Int
     func configure(cell: CharacterCollectionViewCell, at index: Int)
     func willDisplayItem(at index: Int) async
+    func resetAndFetch() async
 }
 
 final class CharactersViewModel {
@@ -29,7 +30,6 @@ final class CharactersViewModel {
     }
     
     private(set) var page: Int = 1
-    private(set) var isPageRefreshing: Bool = false // UIRefreshController
     
     private(set) var characterInfo: RMCharacterInfo?
     private(set) var characters: [RMCharacter] = []
@@ -59,7 +59,6 @@ final class CharactersViewModel {
         let newResults = rmCharacters.results ?? []
         characters.append(contentsOf: newResults)
         
-        characters += rmCharacters.results ?? []
         print("characters: \(characters.count)")
         
         if characters.isEmpty {
@@ -103,5 +102,11 @@ extension CharactersViewModel: CharactersViewModelInterface {
                 await fetchCharacters(page: page)
             }
         }
+    }
+    
+    func resetAndFetch() async {
+        page = 1
+        characters.removeAll()
+        await fetchCharacters(page: 1)
     }
 }

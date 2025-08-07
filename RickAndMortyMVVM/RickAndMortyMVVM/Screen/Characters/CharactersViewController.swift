@@ -30,6 +30,7 @@ final class CharactersViewController: UIViewController,
     
     private lazy var collectionView: UICollectionView = .init()
     
+    private lazy var refreshControl = UIRefreshControl()
     private lazy var indicatorView = UIActivityIndicatorView(style: .large)
     
     private lazy var viewModel = CharactersViewModel(
@@ -42,6 +43,18 @@ final class CharactersViewController: UIViewController,
         Task { [weak self] in
             await self?.viewModel.viewDidLoad()
         }
+    }
+    
+    @objc func pullToRefresh() {
+        Task {
+            collectionView.refreshControl?.beginRefreshing()
+            await viewModel.resetAndFetch()
+            stopRefresher()
+        }
+    }
+    
+    func stopRefresher() {
+        collectionView.refreshControl?.endRefreshing()
     }
 }
 
@@ -102,6 +115,10 @@ extension CharactersViewController: CharactersViewControllerInterface {
         collectionView.showsVerticalScrollIndicator = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
+        collectionView.alwaysBounceVertical = true
+        refreshControl.tintColor = UIColor.red
+        refreshControl.addTarget(self, action: #selector(pullToRefresh), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
         
         view.addSubview(collectionView)
         
